@@ -18,13 +18,13 @@ my %search = ('d', 'ou:', 'y', 'mitDirStudentYear:');
 my %label = ('d', 'Department:', 'y', 'Year:');
 exit 0 if (!exists($search{$s}));
 
-system('athrun consult mmblanche mitsss11 > foo.txt');
+# TODO: Use pipe instead?
+system('athrun consult mmblanche mitsss11 > /tmp/membership.txt');
 
 print "Performing LDAP search... this may take a while, please be patient.\n";
 
 open STDERR, '>', File::Spec->devnull();
-
-open(DATA, '<foo.txt') or die 'File IO failed!';
+open(DATA, '</tmp/membership.txt') or die 'File IO failed!';
 foreach $email (<DATA>) {
   if ($email =~ /\@mit\.edu/) {
     $person = `athrun consult ldaps $email`;
@@ -34,6 +34,8 @@ foreach $email (<DATA>) {
     }
   }
 }
+close DATA;
+close STDERR;
 
 print " done.\n\n";
 while ( ($key, $value) = each %hash ) {
